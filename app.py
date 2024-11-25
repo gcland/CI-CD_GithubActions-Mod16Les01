@@ -1,24 +1,14 @@
-from flask import Flask
-from flask_graphql import GraphQLView
-import graphene
-from schema import Query, Mutation
-from models import db
-from password import password
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:{password}@localhost/inventory_db'
-db.init_app(app)
 
-schema = graphene.Schema(query=Query, mutation=Mutation)
-
-app.add_url_rule(
-    '/graphql',
-    view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True)
-)
-
-with app.app_context():
-    # db.drop_all()
-    db.create_all()
+@app.route('/sum', methods=['POST'])
+def sum():
+    data = request.get_json()
+    num1 = data['num1']
+    num2 = data['num2']
+    result = num1 + num2
+    return jsonify({'result': result})
 
 if __name__ == '__main__':
     app.run(debug=True)
